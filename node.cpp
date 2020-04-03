@@ -69,16 +69,3 @@ unique_ptr<vector<Node*>> Node::path(){
     reverse(path_back.get()->begin(), path_back.get()->end());
     return path_back;
 }
-
-// size_t Node::getHash(const Problem* problem){
-//     bitset<128> bits;
-//     __int128 stateBits = *(__int128*)this->state;
-//     int index = 127;
-//     while(index >= 0){
-//         __int128 bit = stateBits & 1;
-//         bits.set(index, bit ? true : false);
-//         index--;
-//         stateBits >>= 1;
-//     }
-//     return problem->hash_fn(bits);
-// }
