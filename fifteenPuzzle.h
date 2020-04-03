@@ -18,7 +18,7 @@ struct Problem {
     uint8_t initState[16];
     static const uint8_t goalState[16];
     static const int delta[4];
-    const std::hash<std::bitset<128>> hash_fn;
+    const std::hash<std::string> hash_fn;
     
     Problem(uint8_t initState[16]);
     int findBlankSquare(const uint8_t state[16]) const;
@@ -29,8 +29,6 @@ struct Problem {
     size_t getHash(const uint8_t state[16]);
     int h(Node* node);
     
-    int randomInitState();
-
 };
 
 

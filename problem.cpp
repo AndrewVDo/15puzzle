@@ -2,7 +2,7 @@
 #include <string.h>
 #include <iostream>
 
-std::pair<int, int> getLoc2(int index){
+std::pair<int, int> getLoc(int index){
     return std::pair<int, int>(index % 4, int(index / 4));
 }
 
@@ -115,34 +115,25 @@ bool Problem::checkSolvable(const uint8_t state[16]){
             }
         }
     }
-    if(getLoc2(this->findBlankSquare(state)).second % 2 && !(inversions % 2)){
+    if(getLoc(this->findBlankSquare(state)).second % 2 && !(inversions % 2)){
         return true;
     }
-    else if(!getLoc2(this->findBlankSquare(state)).second % 2 && (inversions % 2)){//even row && even inversion
+    else if(!getLoc(this->findBlankSquare(state)).second % 2 && (inversions % 2)){//even row && even inversion
         return true;
     }
     return false;
 }
 
 size_t Problem::getHash(const uint8_t state[16]){
-    bitset<128> bits;
-    __int128 stateBits = *(__int128*)state;
-    int index = 127;
-    while(index >= 0){
-        __int128 bit = stateBits & 1;
-        bits.set(index, bit ? true : false);
-        index--;
-        stateBits >>= 1;
+    char shiftedState[17];
+    for(int i=15; i>=0; i--){
+        shiftedState[i] = 65 + state[i];
     }
-    return this->hash_fn(bits);
+    shiftedState[16] = '\0';
+    string str = shiftedState;
+    return this->hash_fn(str);
 }
 
 int Problem::h(Node* node){
     return 0;
-}
-
-int Problem::randomInitState(){
-    do{
-        random_shuffle(this->initState, &a[15]);
-    }while(!this->checkSolvable);
 }

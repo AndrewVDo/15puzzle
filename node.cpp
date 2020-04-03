@@ -2,9 +2,6 @@
 
 using namespace std;
 
-std::pair<int, int> getLoc(int index){
-    return std::pair<int, int>(index % 4, int(index / 4));
-}
 
 Node::Node(const uint8_t state[16], Node* parent, int action){
     memcpy(this->state, state, 16 * sizeof(uint8_t));

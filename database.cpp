@@ -1,8 +1,20 @@
 #include"fifteenPuzzle.h"
 #include <fstream>
-
+#include <iostream>
+#include <sstream>
 
 using namespace std;
+
+void printState2(uint8_t state[16]){
+    cout << '\n';
+    for(int i=0; i<16; i++){
+        cout << ((state[i] == 42)? '*' : +state[i]) << '\t';
+        if(i%4 == 3){
+            cout << '\n';
+        }
+    }
+    cout << '\n';
+}
 
 Database::Database(Problem* problem){
     this->problem = problem;
@@ -90,6 +102,7 @@ void Database::breadthFirstSearch(){
     while(!frontier.empty()){ 
         databaseSize += this->expand(frontier.front().get(), &frontier);
         frontier.pop();
+        if(databaseSize%1000000 == 0) cout << databaseSize << '\n';
     }
 }
 
@@ -102,13 +115,22 @@ void Database::saveDB(char filename[128]){
     myfile.close();
 }
 
+#include<stdio.h>
 void Database::loadDB(char filename[128]){
-    // ifstream file(filename);
-    // if (file.is_open()) {
-    //     string line;
-    //     while (getline(file, line)) {
-    //         line.find(',')
-    //     }
-    //     file.close();
-    // }
+    ifstream file(filename);
+    if (file.is_open()) {
+        string line;
+        string key;
+        string value;
+        while (getline(file, line)) {
+            getline(file, line);
+            istringstream iss(line);
+            
+            getline(iss, key, ',');
+            getline(iss, value, ',');
+
+            this->table[this->problem->hash_fn(key)] = stoi(value);
+        }
+        file.close();
+    }
 }
