@@ -140,3 +140,9 @@ size_t Problem::getHash(const uint8_t state[16]){
 int Problem::h(Node* node){
     return 0;
 }
+
+int Problem::randomInitState(){
+    do{
+        random_shuffle(this->initState, &a[15]);
+    }while(!this->checkSolvable);
+}

@@ -28,6 +28,7 @@ struct Problem {
     bool checkSolvable(const uint8_t state[16]);
     size_t getHash(const uint8_t state[16]);
     int h(Node* node);
+    
     int randomInitState();
 
 };
