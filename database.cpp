@@ -2,103 +2,92 @@
 
 using namespace std;
 
-const uint8_t Database::quadrantSymbol[4][4] = {
-    { 1, 2 }, //type 1
-    { 4, 3 },
-    { 13, 14 },
-    { 5, 6 }, //type 2
-    { 8, 7 },
-    { 9, 10 },
-    { 12, 11 },
-    { 0, 15 } //type 3
-};
-
 Database::Database(Problem* problem){
     this->problem = problem;
 }
 
 std::unique_ptr<uint8_t[]> Database::encodeState(const uint8_t state[16], int quadrant){
-    auto symbols = this->quadrantSymbol[quadrant];
-    unique_ptr<uint8_t[]> translatedState( new uint8_t[16] );
-    memcpy(translatedState.get(), state, 16 * sizeof(uint8_t));
-    for(int i=0; i<16; i++){
-        if (translatedState[i] == 0) translatedState[i] = 0;
-        else if(translatedState[i] == symbols[0]) translatedState[i] = 'A';
-        else if(translatedState[i] == symbols[1]) translatedState[i] = 'B';
-        else translatedState[i] = '*';
-    }
+    unique_ptr<uint8_t[]> encodedState( new uint8_t[16] );
+    memcpy(encodedState.get(), state, 16 * sizeof(uint8_t));
     switch(quadrant){
+        case 0:
+            for(int i=0; i<16; i++){
+                if(encodedState[i] != 1 && encodedState[i] != 5 && encodedState[i] != 6 && encodedState[i] != 9 && encodedState[i] != 10 && encodedState[i] != 13  && encodedState[i] != 0)
+                    encodedState[i] = '*';
+            };
+            break;
         case 1:
-            this->transformX(translatedState.get());
+            for(int i=0; i<16; i++){
+                if(encodedState[i] != 7 && encodedState[i] != 8 && encodedState[i] != 11 && encodedState[i] != 12 && encodedState[i] != 14 && encodedState[i] != 15 && encodedState[i] != 0)
+                    encodedState[i] = '*';
+            };
             break;
         case 2:
-            this->transformY(translatedState.get());
-            break;
-        case 4:
-            this->transformX(translatedState.get());
-            break;
-        case 5:
-            this->transformY(translatedState.get());
-            break;
-        case 6:
-            this->transformX(translatedState.get());
-            this->transformY(translatedState.get());
+            for(int i=0; i<16; i++){
+                if(encodedState[i] != 2 && encodedState[i] != 3 && encodedState[i] != 4 && encodedState[i] != 0)
+                    encodedState[i] = '*';
+            };
             break;
     }
-    return translatedState;
-}
-
-void Database::transformX(uint8_t state[16]){
-    for(int i=0; i<4; i++){
-        swap(state[i*4+0], state[i*4+3]);
-        swap(state[i*4+1], state[i*4+2]);
-    }
-}
-
-void Database::transformY(uint8_t state[16]){
-    for(int i=0; i<4; i++){
-        swap(state[0*4+i], state[3*4+i]);
-        swap(state[1*4+i], state[2*4+i]);
-    }
+    return encodedState;
 }
 
 int Database::addRow(size_t key, int value){
     auto found = this->table.find(key);
-    if(found != this->table.end()){
-        this->table[key] = (this->table[key] > value) ? value : this->table[key];
-        return 0;
+    if(found == this->table.end()){
+        this->table[key] = value;
+        return 1; //new
     }
-    this->table[key] = value;
-    return 1;
+    if(this->table[key] > value){
+        this->table[key] = value;
+        return 0; //replace
+    }
+    return -1; //none
 }
 
 int Database::checkRow(const uint8_t state[16], int quadrant){
-    auto symbolState = this->encodeState(state, quadrant);
-    auto key = this->problem->getHash(symbolState.get());
+    auto encodedState = this->encodeState(state, quadrant);
+    auto key = this->problem->getHash(encodedState.get());
     return this->table[key];
 }
 
-void Database::expand(const uint8_t state[16], int currentDepth, std::queue<std::pair<std::unique_ptr<uint8_t[]>, int>> &frontier){
-    auto actions = this->problem->actions(state);
-    for(int j=3; j>=0; j--){
-        if(!actions[j]) continue;
-        frontier.push(make_pair(this->problem->result(state, j), currentDepth+1));
+int Database::expand(Node* node, std::queue<std::unique_ptr<Node>>* frontier){
+    auto result = this->addRow(this->problem->getHash(node->state), node->depth);
+    if(result < 0) return 0;
+
+    auto actions = problem->actions(node->state);
+    switch (node->action){
+        case 0:
+            actions[2] = false;
+            break;
+        case 1:
+            actions[3] = false;
+            break;
+        case 2:
+            actions[0] = false;
+            break;
+        case 3:
+            actions[1] = false;
+            break;
     }
+    for(int i=0; i<4; i++){
+        if(actions[i]){
+            frontier->push(unique_ptr<Node>(node->child_node(this->problem, i)));
+        }
+    }
+    return result;
 }
 
-#include<iostream>
 void Database::breadthFirstSearch(){
-    queue<pair<unique_ptr<uint8_t[]>, int>> frontier;
-    frontier.push(make_pair(this->encodeState(this->problem->goalState, 0), 0));
+    queue<unique_ptr<Node>> frontier;
+    frontier.push(unique_ptr<Node>(new Node(this->encodeState(this->problem->goalState, 0).get())));
+    frontier.push(unique_ptr<Node>(new Node(this->encodeState(this->problem->goalState, 1).get())));
+    frontier.push(unique_ptr<Node>(new Node(this->encodeState(this->problem->goalState, 2).get())));
+
     int databaseSize = 0;
-    while(!frontier.empty() && databaseSize < 43680){ 
-        auto hash = this->problem->getHash(frontier.front().first.get());
-        auto depth = frontier.front().second;
-        databaseSize += this->addRow(hash, depth);
-        this->expand(frontier.front().first.get(), depth, frontier);
+    while(!frontier.empty() && databaseSize < 100000/*115,358,880*/){ 
+        databaseSize += this->expand(frontier.front().get(), &frontier);
         frontier.pop();
-        printf("%d\n", databaseSize);
+        if(!(databaseSize % 10000)) printf("%d\n", databaseSize);
     }
 }
-
-//hash ignore 0

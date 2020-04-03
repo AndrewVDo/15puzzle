@@ -49,7 +49,6 @@ struct Node {
 
 struct Database {
 
-    const static uint8_t quadrantSymbol[4][4];
     std::unordered_map<size_t, int> table;
     Problem* problem;
 
@@ -59,7 +58,7 @@ struct Database {
     void transformY(uint8_t state[16]);
     int addRow(size_t key, int value);
     int checkRow(const uint8_t state[16], int quadrant);
-    void expand(const uint8_t state[16], int currentDepth, std::queue<std::pair<std::unique_ptr<uint8_t[]>, int>> &frontier);
+    int expand(Node* node, std::queue<std::unique_ptr<Node>>* frontier);
     void breadthFirstSearch();
 
 };

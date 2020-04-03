@@ -24,6 +24,20 @@ std::unique_ptr<Node*[], std::function<void(Node*[])>> Node::expand(const Proble
         }
     );
     auto actions = problem->actions(this->state);
+    switch (this->action){
+        case 0:
+            actions[2] = false;
+            break;
+        case 1:
+            actions[3] = false;
+            break;
+        case 2:
+            actions[0] = false;
+            break;
+        case 3:
+            actions[1] = false;
+            break;
+    }
     for(int i=0; i<4; i++){
         result[i] = actions[i] ? child_node(problem, i) : NULL;
     }
