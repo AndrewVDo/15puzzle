@@ -1,4 +1,6 @@
 #include"fifteenPuzzle.h"
+#include <fstream>
+
 
 using namespace std;
 
@@ -85,30 +87,28 @@ void Database::breadthFirstSearch(){
     frontier.push(unique_ptr<Node>(new Node(this->encodeState(this->problem->goalState, 2).get())));
 
     int databaseSize = 0;
-    while(!frontier.empty() && databaseSize < 100000/*115,358,880*/){ 
+    while(!frontier.empty()){ 
         databaseSize += this->expand(frontier.front().get(), &frontier);
         frontier.pop();
-        if(!(databaseSize % 10000)) printf("%d%\n", databaseSize/115358880);
     }
 }
 
 void Database::saveDB(char filename[128]){
     ofstream myfile;
     myfile.open(filename);
-    for(pair<size_t. int> element : this->table){
-        myfile << element.first << ' ' << element.second << '\n';
+    for(auto element : this->table){
+        myfile << element.first << ',' << element.second << '\n';
     }
     myfile.close();
 }
 
 void Database::loadDB(char filename[128]){
-    ifstream myfile;
-    myfile.open (filename);
-
-    size_t a;
-    int b;
-    while (infile >> a >> b)
-    {
-        this->table[a] = b;
-    }
+    // ifstream file(filename);
+    // if (file.is_open()) {
+    //     string line;
+    //     while (getline(file, line)) {
+    //         line.find(',')
+    //     }
+    //     file.close();
+    // }
 }

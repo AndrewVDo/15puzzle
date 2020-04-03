@@ -6,8 +6,7 @@
 #include<algorithm>
 #include<unordered_map>
 #include<queue>
-#include<ofstream>
-#include<ifstream>
+#include<fstream>
 
 
 struct Problem;
@@ -29,6 +28,7 @@ struct Problem {
     bool checkSolvable(const uint8_t state[16]);
     size_t getHash(const uint8_t state[16]);
     int h(Node* node);
+    int randomInitState();
 
 };
 
@@ -63,6 +63,6 @@ struct Database {
     int expand(Node* node, std::queue<std::unique_ptr<Node>>* frontier);
     void breadthFirstSearch();
 
-    void generateCSV(char filename[128]);
-    void loadCSV(char filename[128]);
+    void saveDB(char filename[128]);
+    void loadDB(char filename[128]);
 };
