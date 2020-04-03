@@ -3,11 +3,14 @@
 #include<functional>
 #include<tuple>
 #include<bitset>
-#include <algorithm>
+#include<algorithm>
+#include<unordered_map>
+#include<queue>
 
 
 struct Problem;
 struct Node;
+struct Database;
 
 struct Problem {
 
@@ -22,6 +25,7 @@ struct Problem {
     std::unique_ptr<uint8_t[]> result(const uint8_t state[16], int action) const;
     bool goalTest(const uint8_t state[16]);
     bool checkSolvable(const uint8_t state[16]);
+    size_t getHash(const uint8_t state[16]);
     int h(Node* node);
 
 };
@@ -36,10 +40,26 @@ struct Node {
     Node* parent;
         
     Node(const uint8_t state[16], Node* parent=NULL, int action=-1);
-    std::unique_ptr<Node*[]> expand(const Problem* problem); //take all actions
+    std::unique_ptr<Node*[], std::function<void(Node*[])>> expand(const Problem* problem); //take all actions
     Node* child_node(const Problem* problem, int action); //create child as a result of an action
     std::unique_ptr<std::vector<int>> solution();
     std::unique_ptr<std::vector<Node*>> path();
-    size_t getHash(const Problem* problem);
-    
+
+};
+
+struct Database {
+
+    const static uint8_t quadrantSymbol[4][4];
+    std::unordered_map<size_t, int> table;
+    Problem* problem;
+
+    Database(Problem* problem);
+    std::unique_ptr<uint8_t[]> encodeState(const uint8_t state[16], int quadrant=0);
+    void transformX(uint8_t state[16]);
+    void transformY(uint8_t state[16]);
+    int addRow(size_t key, int value);
+    int checkRow(const uint8_t state[16], int quadrant);
+    void expand(const uint8_t state[16], int currentDepth, std::queue<std::pair<std::unique_ptr<uint8_t[]>, int>> &frontier);
+    void breadthFirstSearch();
+
 };

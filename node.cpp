@@ -13,8 +13,16 @@ Node::Node(const uint8_t state[16], Node* parent, int action){
     this->depth = parent ? parent->depth + 1 : 0;
 }
 
-std::unique_ptr<Node*[]> Node::expand(const Problem* problem){
-    unique_ptr<Node*[]> result( new Node*[4]);
+std::unique_ptr<Node*[], std::function<void(Node*[])>> Node::expand(const Problem* problem){
+    unique_ptr<Node*[], std::function<void(Node*[])>> result( new Node*[4], 
+        [&] (Node* children[4]){
+            for(int i=0; i<4; i++){
+                if(children[i]){
+                    delete children[i];
+                }
+            }
+        }
+    );
     auto actions = problem->actions(this->state);
     for(int i=0; i<4; i++){
         result[i] = actions[i] ? child_node(problem, i) : NULL;
@@ -48,15 +56,15 @@ unique_ptr<vector<Node*>> Node::path(){
     return path_back;
 }
 
-size_t Node::getHash(const Problem* problem){
-    bitset<128> bits;
-    __int128 stateBits = *(__int128*)this->state;
-    int index = 127;
-    while(index >= 0){
-        __int128 bit = stateBits & 1;
-        bits.set(index, bit ? true : false);
-        index--;
-        stateBits >>= 1;
-    }
-    return problem->hash_fn(bits);
-}
+// size_t Node::getHash(const Problem* problem){
+//     bitset<128> bits;
+//     __int128 stateBits = *(__int128*)this->state;
+//     int index = 127;
+//     while(index >= 0){
+//         __int128 bit = stateBits & 1;
+//         bits.set(index, bit ? true : false);
+//         index--;
+//         stateBits >>= 1;
+//     }
+//     return problem->hash_fn(bits);
+// }

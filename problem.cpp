@@ -1,5 +1,6 @@
-#include "problem.h"
+#include "fifteenPuzzle.h"
 #include <string.h>
+#include <iostream>
 
 std::pair<int, int> getLoc2(int index){
     return std::pair<int, int>(index % 4, int(index / 4));
@@ -18,7 +19,7 @@ int Problem::findBlankSquare(const uint8_t state[16]) const {
     if(!state){
         throw "state ptr null";
     }
-    for(int i=0; i< 16; i++){
+    for(int i=15; i>=0; i--){
         if(!state[i]) return i;
     }
     throw "blank not found";
@@ -92,7 +93,7 @@ unique_ptr<uint8_t[]> Problem::result(const uint8_t state[16], int action) const
 
     auto neighbor = blank + this->delta[action];
     swap(newState[blank], newState[neighbor]);
-    
+
     return newState;
 }
 
@@ -121,6 +122,19 @@ bool Problem::checkSolvable(const uint8_t state[16]){
         return true;
     }
     return false;
+}
+
+size_t Problem::getHash(const uint8_t state[16]){
+    bitset<128> bits;
+    __int128 stateBits = *(__int128*)state;
+    int index = 127;
+    while(index >= 0){
+        __int128 bit = stateBits & 1;
+        bits.set(index, bit ? true : false);
+        index--;
+        stateBits >>= 1;
+    }
+    return this->hash_fn(bits);
 }
 
 int Problem::h(Node* node){
