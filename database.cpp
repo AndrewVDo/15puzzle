@@ -88,6 +88,27 @@ void Database::breadthFirstSearch(){
     while(!frontier.empty() && databaseSize < 100000/*115,358,880*/){ 
         databaseSize += this->expand(frontier.front().get(), &frontier);
         frontier.pop();
-        if(!(databaseSize % 10000)) printf("%d\n", databaseSize);
+        if(!(databaseSize % 10000)) printf("%d%\n", databaseSize/115358880);
+    }
+}
+
+void Database::saveDB(char filename[128]){
+    ofstream myfile;
+    myfile.open(filename);
+    for(pair<size_t. int> element : this->table){
+        myfile << element.first << ' ' << element.second << '\n';
+    }
+    myfile.close();
+}
+
+void Database::loadDB(char filename[128]){
+    ifstream myfile;
+    myfile.open (filename);
+
+    size_t a;
+    int b;
+    while (infile >> a >> b)
+    {
+        this->table[a] = b;
     }
 }
