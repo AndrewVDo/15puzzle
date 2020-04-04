@@ -134,6 +134,6 @@ size_t Problem::getHash(const uint8_t state[16]){
     return this->hash_fn(str);
 }
 
-int Problem::h(Node* node){
-    return 0;
+int Problem::h(Node* node, Database* db){
+    return db->checkRow(node->state, 0) + db->checkRow(node->state, 1) + db->checkRow(node->state, 2);
 }

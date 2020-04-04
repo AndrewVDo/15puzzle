@@ -26,19 +26,19 @@ std::unique_ptr<uint8_t[]> Database::encodeState(const uint8_t state[16], int qu
     switch(quadrant){
         case 0:
             for(int i=0; i<16; i++){
-                if(encodedState[i] != 1 && encodedState[i] != 5 && encodedState[i] != 6 && encodedState[i] != 9 && encodedState[i] != 10 && encodedState[i] != 13  && encodedState[i] != 0)
+                if(encodedState[i] != 1 && encodedState[i] != 2 && encodedState[i] != 3 && encodedState[i] != 5 && encodedState[i] != 6 && encodedState[i] != 0)
                     encodedState[i] = '*';
             };
             break;
         case 1:
             for(int i=0; i<16; i++){
-                if(encodedState[i] != 7 && encodedState[i] != 8 && encodedState[i] != 11 && encodedState[i] != 12 && encodedState[i] != 14 && encodedState[i] != 15 && encodedState[i] != 0)
+                if(encodedState[i] != 4 && encodedState[i] != 7 && encodedState[i] != 8 && encodedState[i] != 11 && encodedState[i] != 12 &&encodedState[i] != 0)
                     encodedState[i] = '*';
             };
             break;
         case 2:
             for(int i=0; i<16; i++){
-                if(encodedState[i] != 2 && encodedState[i] != 3 && encodedState[i] != 4 && encodedState[i] != 0)
+                if(encodedState[i] != 9 && encodedState[i] != 10 && encodedState[i] != 13 && encodedState[i] != 14 && encodedState[i] != 15 &&encodedState[i] != 0)
                     encodedState[i] = '*';
             };
             break;
@@ -117,6 +117,7 @@ void Database::saveDB(char filename[128]){
 
 #include<stdio.h>
 void Database::loadDB(char filename[128]){
+    size_t linesRead = 0;
     ifstream file(filename);
     if (file.is_open()) {
         string line;
@@ -130,6 +131,8 @@ void Database::loadDB(char filename[128]){
             getline(iss, value, ',');
 
             this->table[this->problem->hash_fn(key)] = stoi(value);
+            linesRead++;
+            if(linesRead % 1000000 == 0) printf("%zu\n", linesRead);
         }
         file.close();
     }

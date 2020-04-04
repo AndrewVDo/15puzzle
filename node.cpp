@@ -10,16 +10,8 @@ Node::Node(const uint8_t state[16], Node* parent, int action){
     this->depth = parent ? parent->depth + 1 : 0;
 }
 
-std::unique_ptr<Node*[], std::function<void(Node*[])>> Node::expand(const Problem* problem){
-    unique_ptr<Node*[], std::function<void(Node*[])>> result( new Node*[4], 
-        [&] (Node* children[4]){
-            for(int i=0; i<4; i++){
-                if(children[i]){
-                    delete children[i];
-                }
-            }
-        }
-    );
+std::unique_ptr<Node*[]> Node::expand(const Problem* problem){
+    unique_ptr<Node*[]> result(new Node*[4]);
     auto actions = problem->actions(this->state);
     switch (this->action){
         case 0:

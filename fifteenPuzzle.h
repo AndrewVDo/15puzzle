@@ -27,7 +27,7 @@ struct Problem {
     bool goalTest(const uint8_t state[16]);
     bool checkSolvable(const uint8_t state[16]);
     size_t getHash(const uint8_t state[16]);
-    int h(Node* node);
+    int h(Node* node, Database* database);
     
 };
 
@@ -41,7 +41,7 @@ struct Node {
     Node* parent;
         
     Node(const uint8_t state[16], Node* parent=NULL, int action=-1);
-    std::unique_ptr<Node*[], std::function<void(Node*[])>> expand(const Problem* problem); //take all actions
+    std::unique_ptr<Node*[]> expand(const Problem* problem); //take all actions
     Node* child_node(const Problem* problem, int action); //create child as a result of an action
     std::unique_ptr<std::vector<int>> solution();
     std::unique_ptr<std::vector<Node*>> path();
@@ -65,3 +65,6 @@ struct Database {
     void saveDB(char filename[128]);
     void loadDB(char filename[128]);
 };
+
+
+//void IDA(Database* db, int limit);
