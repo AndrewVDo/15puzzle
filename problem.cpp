@@ -7,9 +7,6 @@ std::pair<int, int> getLoc(int index){
 
 using namespace std;
 
-const uint8_t Problem::goalState[16] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 0 };
-const int Problem::delta[4] = {-4, +1, +4, -1};
-
 Problem::Problem(uint8_t initState[16]){
     memcpy(this->initState, initState, 16 * sizeof(uint8_t));
 }

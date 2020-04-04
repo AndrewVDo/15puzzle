@@ -8,6 +8,8 @@
 #include<queue>
 #include<fstream>
 #include<stack>
+#include<memory>
+#include<string.h>
 
 struct Problem;
 struct Node;
@@ -16,9 +18,9 @@ struct Database;
 struct Problem {
 
     uint8_t initState[16];
-    static const uint8_t goalState[16];
-    static const int delta[4];
-    const std::hash<std::string> hash_fn;
+    uint8_t goalState[16] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 0 };
+    int delta[4] {-4, +1, +4, -1};
+    std::hash<std::string> hash_fn;
     
     Problem(uint8_t initState[16]);
     int findBlankSquare(const uint8_t state[16]) const;
