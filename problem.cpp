@@ -137,3 +137,28 @@ size_t Problem::getHash(const uint8_t state[16]){
 int Problem::h(Node* node, Database* db){
     return db->checkRow(node->state, 0) + db->checkRow(node->state, 1) + db->checkRow(node->state, 2);
 }
+
+Node* Problem::depth_limited_search(Node* node, int limit){
+    if(this->goalTest(node->state)){
+        return node;
+    }
+    else if(!limit){
+        return NULL;
+    }
+    auto children = node->expand(this);
+    for(int i=0; i<4; i++){
+        if((*children)[i]){
+            auto result = recursive_dls((*children)[i], this, limit-1);
+            return result;
+        }
+    }
+}
+
+Node* Problem::iterative_deepening_search(int limit=50){
+    for(int i=0; i<limit; i++){
+        auto result = depth_limited_search(new Node(this->initState), i);
+        if(result){
+            return result;
+        }
+    }
+}

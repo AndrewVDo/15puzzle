@@ -45,6 +45,9 @@ struct Node {
     Node* child_node(const Problem* problem, int action); //create child as a result of an action
     std::unique_ptr<std::vector<int>> solution();
     std::unique_ptr<std::vector<Node*>> path();
+    
+    Node* depth_limited_search(Node* node, int limit){
+    Node* iterative_deepening_search(int limit){
 
 };
 
@@ -65,6 +68,3 @@ struct Database {
     void saveDB(char filename[128]);
     void loadDB(char filename[128]);
 };
-
-
-//void IDA(Database* db, int limit);
