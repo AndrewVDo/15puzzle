@@ -8,6 +8,17 @@ std::pair<int, int> getLoc(int index){
 
 using namespace std;
 
+void printState3(uint8_t state[16]){
+    cout << '\n';
+    for(int i=0; i<16; i++){
+        cout << +state[i] << '\t';
+        if(i%4 == 3){
+            cout << '\n';
+        }
+    }
+    cout << '\n';
+}
+
 const uint8_t Problem::goalState[16] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 0 };
 const int Problem::delta[4] = {-4, +1, +4, -1};
 
@@ -140,23 +151,23 @@ int Problem::h(Node* node, Database* db){
 
 Node* Problem::depth_limited_search(Node* node, int limit, Database *db, stack<unique_ptr<Node>>& history){
     if(this->goalTest(node->state)){
+        cout << "goal!\n";
         return node;
     }
     else if(!limit){
+        cout << "limit!\n";
         return NULL;
     }
 
     vector<unique_ptr<Node>> children;
     node->expand(this, children);
-    sort(children.begin(), children.end(),
-        [&](unique_ptr<Node> a, unique_ptr<Node> b) -> bool {
-            return this->h(a.get(), db) < this->h(b.get(), db);
-        }
-    );
+
+    cout << "Action" << node->action << " Parent" << +node->parent << " depth" << node->depth;
+    printState3(node->state);
 
     for(int i=0; i<children.size(); i++){
         history.push(move(children[i]));
-        auto result = depth_limited_search(children[i].get(), limit-1, db);
+        auto result = depth_limited_search(history.top().get(), limit-1, db, history);
         if(result){
             return result;
         }
@@ -171,6 +182,7 @@ Node* Problem::iterative_deepening_search(int limit, Database* db, std::stack<st
         auto result = depth_limited_search(history.top().get(), i, db, history);
         if(result){
             return history.top().get();
+        }
         history.pop();
         if(!history.empty()){
             throw "Stack not empty at end!";

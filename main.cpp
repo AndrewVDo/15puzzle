@@ -23,26 +23,26 @@ void randomState(uint8_t state[16], Problem* problem){
 }
 
 int main(){
-    uint8_t state1[16] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 0};
+    uint8_t state1[16] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 10, 11, 13, 14, 15, 12};
 
     Problem *problem = new Problem(state1);
     cout << "loading db ...";
     Database *database = new Database(problem);
 
-    //database->breadthFirstSearch();
-    //database->saveDB("database.txt");
+    database->breadthFirstSearch();
+    database->saveDB("database.txt");
     
-    database->loadDB("database.txt");
+    //database->loadDB("database.txt");
 
 
-     cout << "done!\n Starting IDA\n";
+    cout << "done!\n Starting IDA\n";
 
-     for(int i=0; i< 10; i++){
-        randomState(problem->initState, problem);
+    for(int i=0; i< 1; i++){
+        //randomState(problem->initState, problem);
 
         std::chrono::system_clock::time_point begin = std::chrono::system_clock::now();
-        stack<unique_ptr<Node>> history
-        auto result = problem->iterative_deepening_search(50, database, history);
+        stack<unique_ptr<Node>> history;
+        auto result = problem->iterative_deepening_search(5, database, history);
         std::chrono::system_clock::time_point end = std::chrono::system_clock::now();
 
         printState(problem->initState);
@@ -57,10 +57,10 @@ int main(){
         else{
             cout << "could not find solution to that problem with the given limit on depth\n";
         }
-         
+            
 
-         cout << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() << "us.\n";
-     }
+            cout << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() << "us.\n";
+    }
 
 
     delete problem;

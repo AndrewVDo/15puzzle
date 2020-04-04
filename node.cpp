@@ -10,7 +10,7 @@ Node::Node(const uint8_t state[16], Node* parent, int action){
     this->depth = parent ? parent->depth + 1 : 0;
 }
 
-void Node::expand(const Problem* problem, std::vector<Node>& result){
+void Node::expand(const Problem* problem, std::vector<unique_ptr<Node>>& result){
     auto actions = problem->actions(this->state);
     switch (this->action){
         case 0:

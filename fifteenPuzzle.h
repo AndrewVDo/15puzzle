@@ -44,7 +44,7 @@ struct Node {
     Node* parent;
         
     Node(const uint8_t state[16], Node* parent=NULL, int action=-1);
-    std::unique_ptr<std::array<Node*, 4>> expand(const Problem* problem);
+    void expand(const Problem* problem, std::vector<std::unique_ptr<Node>>& result);
     Node* child_node(const Problem* problem, int action); //create child as a result of an action
     std::unique_ptr<std::vector<int>> solution();
     std::unique_ptr<std::vector<Node*>> path();
