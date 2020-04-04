@@ -138,27 +138,43 @@ int Problem::h(Node* node, Database* db){
     return db->checkRow(node->state, 0) + db->checkRow(node->state, 1) + db->checkRow(node->state, 2);
 }
 
-Node* Problem::depth_limited_search(Node* node, int limit){
+Node* Problem::depth_limited_search(Node* node, int limit, Database *db, stack<unique_ptr<Node>>& history){
     if(this->goalTest(node->state)){
         return node;
     }
     else if(!limit){
         return NULL;
     }
-    auto children = node->expand(this);
-    for(int i=0; i<4; i++){
-        if((*children)[i]){
-            auto result = recursive_dls((*children)[i], this, limit-1);
-            return result;
-        }
-    }
-}
 
-Node* Problem::iterative_deepening_search(int limit=50){
-    for(int i=0; i<limit; i++){
-        auto result = depth_limited_search(new Node(this->initState), i);
+    vector<unique_ptr<Node>> children;
+    node->expand(this, children);
+    sort(children.begin(), children.end(),
+        [&](unique_ptr<Node> a, unique_ptr<Node> b) -> bool {
+            return this->h(a.get(), db) < this->h(b.get(), db);
+        }
+    );
+
+    for(int i=0; i<children.size(); i++){
+        history.push(move(children[i]));
+        auto result = depth_limited_search(children[i].get(), limit-1, db);
         if(result){
             return result;
         }
+        history.pop();
     }
+    return NULL;
+}
+
+Node* Problem::iterative_deepening_search(int limit, Database* db, std::stack<std::unique_ptr<Node>>& history){
+    for(int i=0; i<limit; i++){
+        history.push(unique_ptr<Node>(new Node(this->initState)));
+        auto result = depth_limited_search(history.top().get(), i, db, history);
+        if(result){
+            return history.top().get();
+        history.pop();
+        if(!history.empty()){
+            throw "Stack not empty at end!";
+        }
+    }
+    return NULL;
 }

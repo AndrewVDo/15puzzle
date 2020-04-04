@@ -7,7 +7,7 @@
 #include<unordered_map>
 #include<queue>
 #include<fstream>
-
+#include<stack>
 
 struct Problem;
 struct Node;
@@ -28,6 +28,9 @@ struct Problem {
     bool checkSolvable(const uint8_t state[16]);
     size_t getHash(const uint8_t state[16]);
     int h(Node* node, Database* database);
+
+    Node* depth_limited_search(Node* node, int limit, Database* db, std::stack<std::unique_ptr<Node>>& history);
+    Node* iterative_deepening_search(int limit, Database* db, std::stack<std::unique_ptr<Node>>& history);
     
 };
 
@@ -41,13 +44,10 @@ struct Node {
     Node* parent;
         
     Node(const uint8_t state[16], Node* parent=NULL, int action=-1);
-    std::unique_ptr<Node*[]> expand(const Problem* problem); //take all actions
+    std::unique_ptr<std::array<Node*, 4>> expand(const Problem* problem);
     Node* child_node(const Problem* problem, int action); //create child as a result of an action
     std::unique_ptr<std::vector<int>> solution();
     std::unique_ptr<std::vector<Node*>> path();
-    
-    Node* depth_limited_search(Node* node, int limit){
-    Node* iterative_deepening_search(int limit){
 
 };
 

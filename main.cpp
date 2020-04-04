@@ -37,25 +37,30 @@ int main(){
 
      cout << "done!\n Starting IDA\n";
 
-     for(int i=0; i< 1; i++){
-         randomState(problem->initState, problem);
-         std::chrono::system_clock::time_point begin = std::chrono::system_clock::now();
-         IDA(database);
-         std::chrono::system_clock::time_point end = std::chrono::system_clock::now();
+     for(int i=0; i< 10; i++){
+        randomState(problem->initState, problem);
+
+        std::chrono::system_clock::time_point begin = std::chrono::system_clock::now();
+        stack<unique_ptr<Node>> history
+        auto result = problem->iterative_deepening_search(50, database, history);
+        std::chrono::system_clock::time_point end = std::chrono::system_clock::now();
+
+        printState(problem->initState);
+        if(result){
+            auto solution = result->solution();
+            cout << "solution found, here are the moves: ";
+            for(int i=0; i<(*solution).size(); i++){
+                cout << (*solution)[i] << ' ';
+            }
+            cout << '\n';
+        }
+        else{
+            cout << "could not find solution to that problem with the given limit on depth\n";
+        }
+         
 
          cout << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() << "us.\n";
      }
-
-    
-
-    
-
-
-
-
-
-
-
 
 
     delete problem;
