@@ -23,45 +23,38 @@ void randomState(uint8_t state[16], Problem* problem){
 }
 
 int main(){
-    uint8_t state1[16] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 10, 11, 13, 14, 15, 12};
-
+    cout << "Please wait while the database is setup (17,297,280 rows)\n";
+    uint8_t state1[16] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 0};
     Problem *problem = new Problem(state1);
-    cout << "loading db ...";
     Database *database = new Database(problem);
-
     database->breadthFirstSearch();
-    database->saveDB("database.txt");
-    
-    //database->loadDB("database.txt");
+    //database->saveDB("database.txt"); //use this if you want to inspect the db
 
+    cout << "Database Complete, Starting up IDA*\n";
 
-    cout << "done!\n Starting IDA\n";
-
-    for(int i=0; i< 1; i++){
-        //randomState(problem->initState, problem);
-
+    for(int i=0; i< 10; i++){
+        randomState(problem->initState, problem);
         std::chrono::system_clock::time_point begin = std::chrono::system_clock::now();
         stack<unique_ptr<Node>> history;
-        auto result = problem->iterative_deepening_search(5, database, history);
+        auto result = problem->iterative_deepening_search(1000000, database, history);
         std::chrono::system_clock::time_point end = std::chrono::system_clock::now();
 
+        cout<<"Starting State:";
         printState(problem->initState);
         if(result){
             auto solution = result->solution();
-            cout << "solution found, here are the moves: ";
-            for(int i=0; i<(*solution).size(); i++){
-                cout << (*solution)[i] << ' ';
+            cout << "Solution: ";
+            for(int i=1; i<(*solution).size(); i++){
+                string moves[4] = { "up", "right", "down", "left"};
+                cout << moves[(*solution)[i]] << ", ";
             }
             cout << '\n';
         }
         else{
             cout << "could not find solution to that problem with the given limit on depth\n";
         }
-            
-
-            cout << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() << "us.\n";
+        cout << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() << " microseconds.\n\n";
     }
-
 
     delete problem;
     delete database;

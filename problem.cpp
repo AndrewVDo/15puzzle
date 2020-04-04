@@ -1,23 +1,11 @@
 #include "fifteenPuzzle.h"
 #include <string.h>
-#include <iostream>
 
 std::pair<int, int> getLoc(int index){
     return std::pair<int, int>(index % 4, int(index / 4));
 }
 
 using namespace std;
-
-void printState3(uint8_t state[16]){
-    cout << '\n';
-    for(int i=0; i<16; i++){
-        cout << +state[i] << '\t';
-        if(i%4 == 3){
-            cout << '\n';
-        }
-    }
-    cout << '\n';
-}
 
 const uint8_t Problem::goalState[16] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 0 };
 const int Problem::delta[4] = {-4, +1, +4, -1};
@@ -151,21 +139,20 @@ int Problem::h(Node* node, Database* db){
 
 Node* Problem::depth_limited_search(Node* node, int limit, Database *db, stack<unique_ptr<Node>>& history){
     if(this->goalTest(node->state)){
-        cout << "goal!\n";
         return node;
     }
     else if(!limit){
-        cout << "limit!\n";
         return NULL;
     }
 
     vector<unique_ptr<Node>> children;
     node->expand(this, children);
 
-    cout << "Action" << node->action << " Parent" << +node->parent << " depth" << node->depth;
-    printState3(node->state);
 
     for(int i=0; i<children.size(); i++){
+        if( this->h(children[i].get(), db) > limit){
+            continue;
+        }
         history.push(move(children[i]));
         auto result = depth_limited_search(history.top().get(), limit-1, db, history);
         if(result){
